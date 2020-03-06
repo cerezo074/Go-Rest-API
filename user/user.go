@@ -49,7 +49,7 @@ func One(id bson.ObjectId) (*User, error) {
 
 	defer db.Close()
 	user := new(User)
-	err := db.One("ID", id, user)
+	err = db.One("ID", id, user)
 
 	if err != nil {
 		return nil, err
@@ -62,15 +62,15 @@ func One(id bson.ObjectId) (*User, error) {
 func Delete(id bson.ObjectId) error {
 	db, err := storm.Open(dbPath)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	defer db.Close()
 	user := new(User)
-	err := db.One("ID", id, user)
+	err = db.One("ID", id, user)
 
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	return db.DeleteStruct(user)
@@ -84,7 +84,7 @@ func (u *User) Save() error {
 
 	db, err := storm.Open(dbPath)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	defer db.Close()

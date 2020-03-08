@@ -7,11 +7,13 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/asdine/storm"
 	"gopkg.in/mgo.v2/bson"
 )
 
 const (
 	usersKey string = "users"
+	userKey  string = "user"
 )
 
 func bodyToUser(request *http.Request, user *user.User) error {
@@ -55,15 +57,32 @@ func usersPostOne(writer http.ResponseWriter, request *http.Request) {
 	newUser.ID = bson.NewObjectId()
 	error = newUser.Save()
 
-	if error != nil {
-		if error == user.ErrorRecordInvalid {
-			postError(writer, http.StatusBadRequest)
-			return
-		}
+	if error == user.ErrorRecordInvalid {
+		postError(writer, http.StatusBadRequest)
+		return
+	}
 
+	if error != nil {
 		postError(writer, http.StatusInternalServerError)
 		return
 	}
+
 	writer.Header().Set("Location", UsersPathSlashed+newUser.ID.Hex())
 	writer.WriteHeader(http.StatusCreated)
+}
+
+func usersGetOne(writer http.ResponseWriter, _ *http.Request, userID bson.ObjectId) {
+	user, error := user.One(userID)
+
+	if error == storm.ErrNotFound {
+		postError(writer, http.StatusNotFound)
+		return
+	}
+
+	if error != nil {
+		postError(writer, http.StatusInternalServerError)
+		return
+	}
+
+	postBodyResponse(writer, http.StatusAccepted, jsonResponse{userKey: user})
 }

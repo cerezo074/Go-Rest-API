@@ -43,8 +43,13 @@ func routeUsers(writer http.ResponseWriter, request *http.Request) {
 	case http.MethodPost:
 		usersPostOne(writer, request)
 		return
+	case http.MethodOptions:
+		allowedMethods := []string{http.MethodGet, http.MethodHead, http.MethodPost, http.MethodOptions}
+		postOptionsResponse(writer, allowedMethods, jsonResponse{})
+		return
 	default:
-		postError(writer, http.StatusMethodNotAllowed)
+		allowedMethods := []string{http.MethodGet, http.MethodHead, http.MethodPost, http.MethodOptions}
+		postMethodNotAllowed(writer, allowedMethods)
 	}
 }
 
@@ -66,7 +71,12 @@ func routeUser(idPath string, writer http.ResponseWriter, request *http.Request)
 	case http.MethodDelete:
 		usersDeleteOne(writer, request, userID)
 		return
+	case http.MethodOptions:
+		allowedMethods := []string{http.MethodGet, http.MethodHead, http.MethodPut, http.MethodPatch, http.MethodDelete, http.MethodOptions}
+		postOptionsResponse(writer, allowedMethods, jsonResponse{})
+		return
 	default:
-		postError(writer, http.StatusMethodNotAllowed)
+		allowedMethods := []string{http.MethodGet, http.MethodHead, http.MethodPut, http.MethodPatch, http.MethodDelete, http.MethodOptions}
+		postMethodNotAllowed(writer, allowedMethods)
 	}
 }

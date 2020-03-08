@@ -42,6 +42,11 @@ func usersGetAll(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
+	if request.Method == http.MethodHead {
+		postBodyResponse(writer, http.StatusAccepted, jsonResponse{})
+		return
+	}
+
 	postBodyResponse(writer, http.StatusAccepted, jsonResponse{usersKey: users})
 }
 
@@ -71,7 +76,7 @@ func usersPostOne(writer http.ResponseWriter, request *http.Request) {
 	writer.WriteHeader(http.StatusCreated)
 }
 
-func usersGetOne(writer http.ResponseWriter, _ *http.Request, userID bson.ObjectId) {
+func usersGetOne(writer http.ResponseWriter, request *http.Request, userID bson.ObjectId) {
 	user, error := user.One(userID)
 
 	if error == storm.ErrNotFound {
@@ -81,6 +86,11 @@ func usersGetOne(writer http.ResponseWriter, _ *http.Request, userID bson.Object
 
 	if error != nil {
 		postError(writer, http.StatusInternalServerError)
+		return
+	}
+
+	if request.Method == http.MethodHead {
+		postBodyResponse(writer, http.StatusAccepted, jsonResponse{})
 		return
 	}
 

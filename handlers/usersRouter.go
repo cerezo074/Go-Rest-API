@@ -37,6 +37,9 @@ func routeUsers(writer http.ResponseWriter, request *http.Request) {
 	case http.MethodGet:
 		usersGetAll(writer, request)
 		return
+	case http.MethodHead:
+		usersGetAll(writer, request)
+		return
 	case http.MethodPost:
 		usersPostOne(writer, request)
 		return
@@ -49,6 +52,9 @@ func routeUser(idPath string, writer http.ResponseWriter, request *http.Request)
 	userID := bson.ObjectIdHex(idPath)
 	switch request.Method {
 	case http.MethodGet:
+		usersGetOne(writer, request, userID)
+		return
+	case http.MethodHead:
 		usersGetOne(writer, request, userID)
 		return
 	case http.MethodPut:

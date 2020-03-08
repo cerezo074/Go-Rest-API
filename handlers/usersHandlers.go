@@ -86,3 +86,58 @@ func usersGetOne(writer http.ResponseWriter, _ *http.Request, userID bson.Object
 
 	postBodyResponse(writer, http.StatusAccepted, jsonResponse{userKey: user})
 }
+
+func usersPutOne(writer http.ResponseWriter, request *http.Request, userID bson.ObjectId) {
+	updatedUser := new(user.User)
+	error := bodyToUser(request, updatedUser)
+
+	if error != nil {
+		postError(writer, http.StatusBadRequest)
+		return
+	}
+
+	updatedUser.ID = userID
+	error = updatedUser.Save()
+
+	if error == user.ErrorRecordInvalid {
+		postError(writer, http.StatusBadRequest)
+		return
+	}
+
+	if error != nil {
+		postError(writer, http.StatusInternalServerError)
+		return
+	}
+
+	postBodyResponse(writer, http.StatusAccepted, jsonResponse{userKey: updatedUser})
+}
+
+func usersPatchOne(writer http.ResponseWriter, request *http.Request, userID bson.ObjectId) {
+	updatedUser, error := user.One(userID)
+
+	if error == storm.ErrNotFound {
+		postError(writer, http.StatusNotFound)
+		return
+	}
+
+	if error != nil {
+		postError(writer, http.StatusInternalServerError)
+		return
+	}
+
+	error = bodyToUser(request, updatedUser)
+
+	if error != nil {
+		postError(writer, http.StatusBadRequest)
+		return
+	}
+
+	error = updatedUser.Save()
+
+	if error != nil {
+		postError(writer, http.StatusInternalServerError)
+		return
+	}
+
+	postBodyResponse(writer, http.StatusAccepted, jsonResponse{userKey: updatedUser})
+}

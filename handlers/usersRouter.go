@@ -52,8 +52,10 @@ func routeUser(idPath string, writer http.ResponseWriter, request *http.Request)
 		usersGetOne(writer, request, userID)
 		return
 	case http.MethodPut:
+		usersPutOne(writer, request, userID)
 		return
 	case http.MethodPatch:
+		usersPatchOne(writer, request, userID)
 		return
 	case http.MethodDelete:
 		return

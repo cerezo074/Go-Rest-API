@@ -58,6 +58,7 @@ func routeUser(idPath string, writer http.ResponseWriter, request *http.Request)
 		usersPatchOne(writer, request, userID)
 		return
 	case http.MethodDelete:
+		usersDeleteOne(writer, request, userID)
 		return
 	default:
 		postError(writer, http.StatusMethodNotAllowed)

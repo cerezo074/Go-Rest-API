@@ -141,3 +141,19 @@ func usersPatchOne(writer http.ResponseWriter, request *http.Request, userID bso
 
 	postBodyResponse(writer, http.StatusAccepted, jsonResponse{userKey: updatedUser})
 }
+
+func usersDeleteOne(writer http.ResponseWriter, _ *http.Request, userID bson.ObjectId) {
+	error := user.Delete(userID)
+
+	if error == storm.ErrNotFound {
+		postError(writer, http.StatusNotFound)
+		return
+	}
+
+	if error != nil {
+		postError(writer, http.StatusInternalServerError)
+		return
+	}
+
+	writer.WriteHeader(http.StatusAccepted)
+}

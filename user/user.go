@@ -19,7 +19,7 @@ const (
 )
 
 var (
-	ErrRecordInvalid = errors.New("record is invalid")
+	ErrorRecordInvalid = errors.New("record is invalid")
 )
 
 //All fetches all users from the database
@@ -94,7 +94,7 @@ func (u *User) Save() error {
 //validate makes sure a user contains valid data
 func (u *User) validate() error {
 	if u.Name == "" {
-		return ErrRecordInvalid
+		return ErrorRecordInvalid
 	}
 
 	return nil

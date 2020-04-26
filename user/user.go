@@ -18,8 +18,9 @@ const (
 	dbPath string = "users.db"
 )
 
+//ErrRecordInvalid used when the integrity of the holded data is not correct(e.g. id not preset)
 var (
-	ErrorRecordInvalid = errors.New("record is invalid")
+	ErrRecordInvalid = errors.New("record is invalid")
 )
 
 //All fetches all users from the database
@@ -94,7 +95,7 @@ func (u *User) Save() error {
 //validate makes sure a user contains valid data
 func (u *User) validate() error {
 	if u.Name == "" {
-		return ErrorRecordInvalid
+		return ErrRecordInvalid
 	}
 
 	return nil

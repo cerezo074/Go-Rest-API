@@ -17,6 +17,10 @@ const (
 )
 
 func bodyToUser(request *http.Request, user *user.User) error {
+	if request == nil {
+		return errors.New("Request is required")
+	}
+
 	if request.Body == nil {
 		return errors.New("Request body is empty")
 	}

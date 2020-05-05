@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github/cerezo074/GoAPI/handlers"
+	"projects/GoAPI/handlers"
 	"net/http"
 	"os"
 )

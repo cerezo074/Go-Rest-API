@@ -14,6 +14,15 @@ func TestMain(testSuite *testing.M) {
 	os.Remove(dbPath)
 }
 
+func BenchmarkCRUD(testCase *testing.B) {
+	os.Remove((dbPath))
+	testCase.ResetTimer()
+
+	for i := 0; i < testCase.N; i++ {
+
+	}
+}
+
 func TestCRUD(testCase *testing.T) {
 	///////////////////
 	testCase.Log("Create")

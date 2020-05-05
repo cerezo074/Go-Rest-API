@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github/cerezo074/GoAPI/user"
+	"projects/GoAPI/user"
 
 	"gopkg.in/mgo.v2/bson"
 )

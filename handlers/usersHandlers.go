@@ -3,9 +3,11 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
-	"github/cerezo074/GoAPI/user"
 	"io/ioutil"
 	"net/http"
+
+	"projects/GoAPI/cache"
+	"projects/GoAPI/user"
 
 	"github.com/asdine/storm"
 	"gopkg.in/mgo.v2/bson"
@@ -39,6 +41,10 @@ func bodyToUser(request *http.Request, user *user.User) error {
 }
 
 func usersGetAll(writer http.ResponseWriter, request *http.Request) {
+	if cache.Serve(writer, request) {
+		return
+	}
+
 	users, error := user.All()
 
 	if error != nil {
@@ -66,7 +72,7 @@ func usersPostOne(writer http.ResponseWriter, request *http.Request) {
 	newUser.ID = bson.NewObjectId()
 	error = newUser.Save()
 
-	if error == user.ErrorRecordInvalid {
+	if error == user.ErrRecordInvalid {
 		postError(writer, http.StatusBadRequest)
 		return
 	}
@@ -76,11 +82,16 @@ func usersPostOne(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
+	cache.Drop(UsersPathSlashed)
 	writer.Header().Set("Location", UsersPathSlashed+newUser.ID.Hex())
 	writer.WriteHeader(http.StatusCreated)
 }
 
 func usersGetOne(writer http.ResponseWriter, request *http.Request, userID bson.ObjectId) {
+	if cache.Serve(writer, request) {
+		return
+	}
+
 	user, error := user.One(userID)
 
 	if error == storm.ErrNotFound {
@@ -113,7 +124,7 @@ func usersPutOne(writer http.ResponseWriter, request *http.Request, userID bson.
 	updatedUser.ID = userID
 	error = updatedUser.Save()
 
-	if error == user.ErrorRecordInvalid {
+	if error == user.ErrRecordInvalid {
 		postError(writer, http.StatusBadRequest)
 		return
 	}
@@ -123,6 +134,8 @@ func usersPutOne(writer http.ResponseWriter, request *http.Request, userID bson.
 		return
 	}
 
+	cache.Drop(UsersPathSlashed)
+	cache.Drop(cache.MakeResource(request))
 	postBodyResponse(writer, http.StatusAccepted, jsonResponse{userKey: updatedUser})
 }
 
@@ -153,10 +166,12 @@ func usersPatchOne(writer http.ResponseWriter, request *http.Request, userID bso
 		return
 	}
 
+	cache.Drop(UsersPathSlashed)
+	cache.Drop(cache.MakeResource(request))
 	postBodyResponse(writer, http.StatusAccepted, jsonResponse{userKey: updatedUser})
 }
 
-func usersDeleteOne(writer http.ResponseWriter, _ *http.Request, userID bson.ObjectId) {
+func usersDeleteOne(writer http.ResponseWriter, request *http.Request, userID bson.ObjectId) {
 	error := user.Delete(userID)
 
 	if error == storm.ErrNotFound {
@@ -169,5 +184,7 @@ func usersDeleteOne(writer http.ResponseWriter, _ *http.Request, userID bson.Obj
 		return
 	}
 
+	cache.Drop(UsersPathSlashed)
+	cache.Drop(cache.MakeResource(request))
 	writer.WriteHeader(http.StatusAccepted)
 }

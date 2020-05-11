@@ -57,7 +57,8 @@ func usersGetAll(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	postBodyResponse(writer, http.StatusAccepted, jsonResponse{usersKey: users})
+	customWriter := cache.NewWritter(writer, request)
+	postBodyResponse(customWriter, http.StatusAccepted, jsonResponse{usersKey: users})
 }
 
 func usersPostOne(writer http.ResponseWriter, request *http.Request) {
@@ -109,7 +110,8 @@ func usersGetOne(writer http.ResponseWriter, request *http.Request, userID bson.
 		return
 	}
 
-	postBodyResponse(writer, http.StatusAccepted, jsonResponse{userKey: user})
+	customWriter := cache.NewWritter(writer, request)
+	postBodyResponse(customWriter, http.StatusAccepted, jsonResponse{userKey: user})
 }
 
 func usersPutOne(writer http.ResponseWriter, request *http.Request, userID bson.ObjectId) {
@@ -135,8 +137,8 @@ func usersPutOne(writer http.ResponseWriter, request *http.Request, userID bson.
 	}
 
 	cache.Drop(UsersPathSlashed)
-	cache.Drop(cache.MakeResource(request))
-	postBodyResponse(writer, http.StatusAccepted, jsonResponse{userKey: updatedUser})
+	customWriter := cache.NewWritter(writer, request)
+	postBodyResponse(customWriter, http.StatusAccepted, jsonResponse{userKey: updatedUser})
 }
 
 func usersPatchOne(writer http.ResponseWriter, request *http.Request, userID bson.ObjectId) {
@@ -167,8 +169,8 @@ func usersPatchOne(writer http.ResponseWriter, request *http.Request, userID bso
 	}
 
 	cache.Drop(UsersPathSlashed)
-	cache.Drop(cache.MakeResource(request))
-	postBodyResponse(writer, http.StatusAccepted, jsonResponse{userKey: updatedUser})
+	customWriter := cache.NewWritter(writer, request)
+	postBodyResponse(customWriter, http.StatusAccepted, jsonResponse{userKey: updatedUser})
 }
 
 func usersDeleteOne(writer http.ResponseWriter, request *http.Request, userID bson.ObjectId) {
